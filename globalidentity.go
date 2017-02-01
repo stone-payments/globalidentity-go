@@ -12,6 +12,7 @@ const (
 	isUserInRolesSuffix       = "/api/authorization/isuserinroles"
 	validateTokenSuffix       = "/api/authorization/validatetokenresponse"
 	renewTokenSuffix          = "/api/authorization/renewtoken"
+	recoverPasswordSuffix     = "/api/authorization/recoverPassword"
 )
 
 type GlobalIdentityError []string
@@ -31,6 +32,7 @@ type GlobalIdentityManager interface {
 	IsUserInRoles(userKey string, roles ...string) (bool, error)
 	RenewToken(token string) (string, error)
 	ValidateApplication(clientApplicationKey string, rawData string, encryptedData string) (bool, error)
+	RecoverPassword(email string) (bool, error)
 }
 
 type globalIdentityManager struct {
@@ -39,7 +41,8 @@ type globalIdentityManager struct {
 }
 
 func New(applicationKey string, globalIdentityHost string) GlobalIdentityManager {
-	return &globalIdentityManager{applicationKey,
+	return &globalIdentityManager{
+		applicationKey,
 		globalIdentityHost,
 	}
 }
@@ -79,6 +82,40 @@ func (gim *globalIdentityManager) AuthenticateUser(email string, password string
 	globalIdentityUser.Token = response.AuthenticationToken
 	globalIdentityUser.Key = response.UserKey
 	return &globalIdentityUser, err
+}
+
+func (gim *globalIdentityManager) RecoverPassword(email string) (bool, error) {
+	request := recoverPasswordRequest{
+		ApplicationKey: gim.applicationKey,
+		Email:          email,
+	}
+
+	json, err := toJson(request)
+	if err != nil {
+		return false, err
+	}
+
+	resp, err := http.Post(gim.globalIdentityHost+recoverPasswordSuffix, contentJson, json)
+	if err != nil {
+		return false, err
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return false, GlobalIdentityError([]string{fmt.Sprintf("%v", resp.StatusCode)})
+	}
+
+	var response recoverPasswordResponse
+
+	err = fromJson(&response, resp.Body)
+	if err != nil {
+		return false, err
+	}
+
+	if len(response.OperationReport) > 0 {
+		err = GlobalIdentityError(response.OperationReport)
+	}
+
+	return response.Success, err
 }
 
 func (gim *globalIdentityManager) ValidateToken(token string) (bool, error) {
