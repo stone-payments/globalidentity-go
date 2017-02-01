@@ -7,10 +7,16 @@ type authenticateUserResponse struct {
 	Name                     string `json:"Name"`
 	Success                  bool   `json:"Success"`
 }
+
 type validateTokenResponse struct {
 	ExpirationInMinutes int      `json:"ExpirationInMinutes"`
 	Success             bool     `json:"Success"`
 	OperationReport     []string `json:"OperationReport"`
+}
+
+type recoverPasswordResponse struct {
+	Success         bool     `json:"Success"`
+	OperationReport []string `json:"OperationReport"`
 }
 
 type renewTokenResponse struct {
