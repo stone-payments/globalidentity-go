@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -15,7 +16,53 @@ const (
 	isUserInRolesUrl       = "https://dlpgi.dlp-payments.com/api/authorization/isuserinroles"
 	validateTokenUrl       = "https://dlpgi.dlp-payments.com/api/authorization/validatetokenresponse"
 	renewTokenUrl          = "https://dlpgi.dlp-payments.com/api/authorization/renewtoken"
+	recoverPasswordUrl     = "https://dlpgi.dlp-payments.com/api/authorization/recoverPassword"
 )
+
+func TestRecoverPasswordWrongStatusCode(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	httpmock.RegisterResponder("POST", recoverPasswordUrl, httpmock.NewStringResponder(http.StatusInternalServerError, ""))
+
+	gim := New("test", globalApplicationUrl)
+	_, err := gim.RecoverPassword("test@test.com.br")
+	assert.NotNil(t, err)
+}
+
+func TestRecoverPasswordWrongResponse(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	httpmock.RegisterResponder("POST", recoverPasswordUrl, httpmock.NewStringResponder(http.StatusOK, "mock"))
+
+	gim := New("test", globalApplicationUrl)
+	_, err := gim.RecoverPassword("test@test.com.br")
+	assert.NotNil(t, err)
+}
+
+func TestRecoverPasswordWithOperationReport(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	httpmock.RegisterResponder("POST", recoverPasswordUrl, httpmock.NewStringResponder(http.StatusOK, `{"Success": false, "OperationReport": ["test", "mock"]}`))
+
+	gim := New("test", globalApplicationUrl)
+	_, err := gim.RecoverPassword("test@test.com.br")
+	assert.NotNil(t, err)
+}
+
+func TestRecoverPasswordOk(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	httpmock.RegisterResponder("POST", recoverPasswordUrl, httpmock.NewStringResponder(http.StatusOK, `{"Success": true, "OperationReport": []}`))
+
+	gim := New("test", globalApplicationUrl)
+	ok, err := gim.RecoverPassword("test@test.com.br")
+	assert.True(t, ok)
+	assert.Nil(t, err)
+}
 
 func TestGlobalIdentityManager_ValidateApplication(t *testing.T) {
 	httpmock.Activate()
