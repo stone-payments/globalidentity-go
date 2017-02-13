@@ -20,6 +20,11 @@ type validateTokenResponse struct {
 	OperationReport     []string `json:"OperationReport"`
 }
 
+type recoverPasswordResponse struct {
+	Success         bool     `json:"Success"`
+	OperationReport []string `json:"OperationReport"`
+}
+
 type renewTokenResponse struct {
 	NewToken            string   `json:"NewToken"`
 	ExpirationInMinutes int      `json:"ExpirationInMinutes"`

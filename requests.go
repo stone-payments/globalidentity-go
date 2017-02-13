@@ -7,6 +7,11 @@ type authenticateUserRequest struct {
 	TokenExpirationInMinutes int    `json:"TokenExpirationInMinutes"`
 }
 
+type recoverPasswordRequest struct {
+	ApplicationKey string `json:"ApplicationKey"`
+	Email          string `json:"Email"`
+}
+
 type renewTokenRequest struct {
 	ApplicationKey string `json:"ApplicationKey"`
 	Token          string `json:"Token"`
