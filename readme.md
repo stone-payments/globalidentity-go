@@ -4,7 +4,7 @@
 ## Instalação
 
 ```go
-go get github.com/julio-vaz/globalidentity
+go get github.com/stone-pagamentos/globalidentity-go
 ```
 
 ## Funcionalidades
@@ -24,3 +24,5 @@ go get github.com/julio-vaz/globalidentity
  - **Renovação de tokens**
   - RenewToken(token string) (string, error)
 
+ - **Recuperação de senha**
+   - RecoverPassword(email string) (bool, error)

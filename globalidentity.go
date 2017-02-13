@@ -12,6 +12,7 @@ const (
 	isUserInRolesSuffix       = "/api/authorization/isuserinroles"
 	validateTokenSuffix       = "/api/authorization/validatetokenresponse"
 	renewTokenSuffix          = "/api/authorization/renewtoken"
+	recoverPasswordSuffix     = "/api/authorization/recoverPassword"
 )
 
 type GlobalIdentityError []string
@@ -20,12 +21,18 @@ func (e GlobalIdentityError) Error() string {
 	return fmt.Sprintf("%#v", []string(e))
 }
 
+type GlobalIdentityUser struct {
+	Token string
+	Key   string
+}
+
 type GlobalIdentityManager interface {
-	AuthenticateUser(email string, password string, expirationInMinutes ...int) (string, error)
+	AuthenticateUser(email string, password string, expirationInMinutes ...int) (*GlobalIdentityUser, error)
 	ValidateToken(token string) (bool, error)
 	IsUserInRoles(userKey string, roles ...string) (bool, error)
 	RenewToken(token string) (string, error)
-	ValidateApplication(applicationKey string, clientApplicationKey string, rawData string, encryptedData string) (bool, error)
+	ValidateApplication(clientApplicationKey string, rawData string, encryptedData string) (bool, error)
+	RecoverPassword(email string) (bool, error)
 }
 
 type globalIdentityManager struct {
@@ -34,12 +41,13 @@ type globalIdentityManager struct {
 }
 
 func New(applicationKey string, globalIdentityHost string) GlobalIdentityManager {
-	return &globalIdentityManager{applicationKey,
+	return &globalIdentityManager{
+		applicationKey,
 		globalIdentityHost,
 	}
 }
 
-func (gim *globalIdentityManager) AuthenticateUser(email string, password string, expirationInMinutes ...int) (string, error) {
+func (gim *globalIdentityManager) AuthenticateUser(email string, password string, expirationInMinutes ...int) (*GlobalIdentityUser, error) {
 	expirationInMinutes = append(expirationInMinutes, 15)
 	request := &authenticateUserRequest{
 		ApplicationKey:           gim.applicationKey,
@@ -49,28 +57,65 @@ func (gim *globalIdentityManager) AuthenticateUser(email string, password string
 	}
 	json, err := toJson(request)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-
 	resp, err := http.Post(gim.globalIdentityHost+authenticateUserSuffix, contentJson, json)
 	if err != nil {
-		return "", err
-	}
-
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return "", GlobalIdentityError([]string{fmt.Sprintf("%v", resp.StatusCode)})
+		return nil, err
 	}
 
 	var response authenticateUserResponse
 
 	err = fromJson(&response, resp.Body)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	if !response.Success {
-		err = GlobalIdentityError([]string{"Invalid email or password"})
+		var messages []string
+		for _, operationReport := range response.OperationReport {
+			messages = append(messages, operationReport.Message)
+		}
+		err = GlobalIdentityError(messages)
 	}
-	return response.AuthenticationToken, err
+
+	var globalIdentityUser GlobalIdentityUser
+	globalIdentityUser.Token = response.AuthenticationToken
+	globalIdentityUser.Key = response.UserKey
+	return &globalIdentityUser, err
+}
+
+func (gim *globalIdentityManager) RecoverPassword(email string) (bool, error) {
+	request := recoverPasswordRequest{
+		ApplicationKey: gim.applicationKey,
+		Email:          email,
+	}
+
+	json, err := toJson(request)
+	if err != nil {
+		return false, err
+	}
+
+	resp, err := http.Post(gim.globalIdentityHost+recoverPasswordSuffix, contentJson, json)
+	if err != nil {
+		return false, err
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return false, GlobalIdentityError([]string{fmt.Sprintf("%v", resp.StatusCode)})
+	}
+
+	var response recoverPasswordResponse
+
+	err = fromJson(&response, resp.Body)
+	if err != nil {
+		return false, err
+	}
+
+	if len(response.OperationReport) > 0 {
+		err = GlobalIdentityError(response.OperationReport)
+	}
+
+	return response.Success, err
 }
 
 func (gim *globalIdentityManager) ValidateToken(token string) (bool, error) {
@@ -167,7 +212,7 @@ func (gim *globalIdentityManager) RenewToken(token string) (string, error) {
 	return response.NewToken, err
 }
 
-func (gim *globalIdentityManager) ValidateApplication(applicationKey string, clientApplicationKey string, rawData string, encryptedData string) (bool, error) {
+func (gim *globalIdentityManager) ValidateApplication(clientApplicationKey string, rawData string, encryptedData string) (bool, error) {
 
 	request := &validateApplicationRequest{
 		ApplicationKey:       gim.applicationKey,

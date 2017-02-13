@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -15,7 +16,53 @@ const (
 	isUserInRolesUrl       = "https://dlpgi.dlp-payments.com/api/authorization/isuserinroles"
 	validateTokenUrl       = "https://dlpgi.dlp-payments.com/api/authorization/validatetokenresponse"
 	renewTokenUrl          = "https://dlpgi.dlp-payments.com/api/authorization/renewtoken"
+	recoverPasswordUrl     = "https://dlpgi.dlp-payments.com/api/authorization/recoverPassword"
 )
+
+func TestRecoverPasswordWrongStatusCode(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	httpmock.RegisterResponder("POST", recoverPasswordUrl, httpmock.NewStringResponder(http.StatusInternalServerError, ""))
+
+	gim := New("test", globalApplicationUrl)
+	_, err := gim.RecoverPassword("test@test.com.br")
+	assert.NotNil(t, err)
+}
+
+func TestRecoverPasswordWrongResponse(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	httpmock.RegisterResponder("POST", recoverPasswordUrl, httpmock.NewStringResponder(http.StatusOK, "mock"))
+
+	gim := New("test", globalApplicationUrl)
+	_, err := gim.RecoverPassword("test@test.com.br")
+	assert.NotNil(t, err)
+}
+
+func TestRecoverPasswordWithOperationReport(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	httpmock.RegisterResponder("POST", recoverPasswordUrl, httpmock.NewStringResponder(http.StatusOK, `{"Success": false, "OperationReport": ["test", "mock"]}`))
+
+	gim := New("test", globalApplicationUrl)
+	_, err := gim.RecoverPassword("test@test.com.br")
+	assert.NotNil(t, err)
+}
+
+func TestRecoverPasswordOk(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	httpmock.RegisterResponder("POST", recoverPasswordUrl, httpmock.NewStringResponder(http.StatusOK, `{"Success": true, "OperationReport": []}`))
+
+	gim := New("test", globalApplicationUrl)
+	ok, err := gim.RecoverPassword("test@test.com.br")
+	assert.True(t, ok)
+	assert.Nil(t, err)
+}
 
 func TestGlobalIdentityManager_ValidateApplication(t *testing.T) {
 	httpmock.Activate()
@@ -24,7 +71,7 @@ func TestGlobalIdentityManager_ValidateApplication(t *testing.T) {
 	httpmock.RegisterResponder("POST", validateApplicationUrl, httpmock.NewStringResponder(http.StatusInternalServerError, ""))
 
 	gim := New("test", globalApplicationUrl)
-	_, err := gim.ValidateApplication("", "", "", "")
+	_, err := gim.ValidateApplication("", "", "")
 	if err == nil {
 		t.FailNow()
 	}
@@ -37,7 +84,7 @@ func TestGlobalIdentityManager_ValidateApplication(t *testing.T) {
 	httpmock.RegisterResponder("POST", validateApplicationUrl, httpmock.NewStringResponder(http.StatusOK, string(okResponse)))
 
 	gim = New("test", globalApplicationUrl)
-	ok, err := gim.ValidateApplication("", "", "", "")
+	ok, err := gim.ValidateApplication("", "", "")
 	if !ok || err != nil {
 		t.FailNow()
 	}
@@ -49,7 +96,7 @@ func TestGlobalIdentityManager_ValidateApplication(t *testing.T) {
 
 	httpmock.RegisterResponder("POST", validateApplicationUrl, httpmock.NewStringResponder(http.StatusOK, string(notOkResponse)))
 
-	ok, err = gim.ValidateApplication("", "", "", "")
+	ok, err = gim.ValidateApplication("", "", "")
 	if ok {
 		t.FailNow()
 	}
@@ -60,7 +107,7 @@ func TestGlobalIdentityManager_ValidateApplication(t *testing.T) {
 
 	httpmock.RegisterResponder("POST", validateApplicationUrl, httpmock.NewStringResponder(http.StatusOK, "{\"saa}"))
 
-	_, err = gim.ValidateApplication("", "", "", "")
+	_, err = gim.ValidateApplication("", "", "")
 
 	if err == nil {
 		t.FailNow()
@@ -95,18 +142,23 @@ func TestGlobalIdentityManager_AuthenticateUser(t *testing.T) {
 		t.FailNow()
 	}
 
+	oprep := []loginOperationReport{
+		{Message: "error1", Field: "login"},
+		{Message: "error2", Field: "login"},
+	}
 	notOkResponse, _ := json.Marshal(&authenticateUserResponse{
 		Success:                  false,
 		AuthenticationToken:      "banana",
 		TokenExpirationInMinutes: 1,
 		UserKey:                  "user",
 		Name:                     "user",
+		OperationReport:          oprep,
 	})
 
 	httpmock.RegisterResponder("POST", authenticateUserUrl, httpmock.NewStringResponder(http.StatusOK, string(notOkResponse)))
 
 	_, err = gim.AuthenticateUser("", "")
-	if err == nil {
+	if err.Error() != `[]string{"error1", "error2"}` {
 		t.FailNow()
 	}
 
