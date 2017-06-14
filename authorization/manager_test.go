@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	core "globalidentity-go"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 )
@@ -100,7 +101,7 @@ func TestGlobalIdentityManager_ValidateApplication(t *testing.T) {
 	if ok {
 		t.FailNow()
 	}
-	giErr := err.(GlobalIdentityError)
+	giErr := err.(core.GlobalIdentityError)
 	if len(giErr) != 1 || giErr[0] != "error" {
 		t.FailNow()
 	}
@@ -207,7 +208,7 @@ func TestGlobalIdentityManager_IsUserInRoles(t *testing.T) {
 	if ok {
 		t.FailNow()
 	}
-	giErr := err.(GlobalIdentityError)
+	giErr := err.(core.GlobalIdentityError)
 	if len(giErr) != 1 || giErr[0] != "error" {
 		t.FailNow()
 	}
@@ -257,7 +258,7 @@ func TestGlobalIdentityManager_ValidateToken(t *testing.T) {
 	if ok {
 		t.FailNow()
 	}
-	giErr := err.(GlobalIdentityError)
+	giErr := err.(core.GlobalIdentityError)
 	if len(giErr) != 1 || giErr[0] != "error" {
 		t.FailNow()
 	}
@@ -310,7 +311,7 @@ func TestGlobalIdentityManager_RenewToken(t *testing.T) {
 		t.FailNow()
 	}
 
-	giErr := err.(GlobalIdentityError)
+	giErr := err.(core.GlobalIdentityError)
 	if len(giErr) != 1 || giErr[0] != "error" {
 		t.FailNow()
 	}
@@ -320,13 +321,6 @@ func TestGlobalIdentityManager_RenewToken(t *testing.T) {
 	_, err = gim.RenewToken("")
 
 	if err == nil {
-		t.FailNow()
-	}
-}
-
-func TestGlobalIdentityError_Error(t *testing.T) {
-	err := GlobalIdentityError([]string{"error01", "error01"})
-	if err.Error() != `[]string{"error01", "error01"}` {
 		t.FailNow()
 	}
 }
