@@ -7,7 +7,7 @@ import (
 )
 
 type GlobalIdentityManager interface {
-	AuthenticateUser(email string, password string, expirationInMinutes ...int) (*GlobalIdentityUser, error)
+	AuthenticateUser(email string, password string, expirationInMinutes ...int) (*core.Authorization, error)
 	ValidateToken(token string) (bool, error)
 	IsUserInRoles(userKey string, roles ...string) (bool, error)
 	RenewToken(token string) (string, error)
@@ -27,7 +27,7 @@ func New(applicationKey string, globalIdentityHost string) GlobalIdentityManager
 	}
 }
 
-func (gim *globalIdentityManager) AuthenticateUser(email string, password string, expirationInMinutes ...int) (*GlobalIdentityUser, error) {
+func (gim *globalIdentityManager) AuthenticateUser(email string, password string, expirationInMinutes ...int) (*core.Authorization, error) {
 	expirationInMinutes = append(expirationInMinutes, 15)
 	request := &authenticateUserRequest{
 		ApplicationKey:           gim.applicationKey,
@@ -58,7 +58,7 @@ func (gim *globalIdentityManager) AuthenticateUser(email string, password string
 		err = core.GlobalIdentityError(messages)
 	}
 
-	var globalIdentityUser GlobalIdentityUser
+	var globalIdentityUser core.Authorization
 	globalIdentityUser.Token = response.AuthenticationToken
 	globalIdentityUser.Key = response.UserKey
 	return &globalIdentityUser, err
