@@ -1,4 +1,4 @@
-package globalidentity
+package authorization
 
 import (
 	"encoding/json"

@@ -1,8 +1,9 @@
-package globalidentity
+package authorization
 
 import (
 	"fmt"
 	"net/http"
+	core "globalidentity-go"
 )
 
 const (
@@ -55,7 +56,7 @@ func (gim *globalIdentityManager) AuthenticateUser(email string, password string
 		Email:    email,
 		Password: password,
 	}
-	json, err := toJson(request)
+	json, err := core.ToJson(request)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +67,7 @@ func (gim *globalIdentityManager) AuthenticateUser(email string, password string
 
 	var response authenticateUserResponse
 
-	err = fromJson(&response, resp.Body)
+	err = core.FromJson(&response, resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +91,7 @@ func (gim *globalIdentityManager) RecoverPassword(email string) (bool, error) {
 		Email:          email,
 	}
 
-	json, err := toJson(request)
+	json, err := core.ToJson(request)
 	if err != nil {
 		return false, err
 	}
@@ -106,7 +107,7 @@ func (gim *globalIdentityManager) RecoverPassword(email string) (bool, error) {
 
 	var response recoverPasswordResponse
 
-	err = fromJson(&response, resp.Body)
+	err = core.FromJson(&response, resp.Body)
 	if err != nil {
 		return false, err
 	}
@@ -123,7 +124,7 @@ func (gim *globalIdentityManager) ValidateToken(token string) (bool, error) {
 		ApplicationKey: gim.applicationKey,
 		Token:          token,
 	}
-	json, err := toJson(request)
+	json, err := core.ToJson(request)
 	if err != nil {
 		return false, err
 	}
@@ -139,7 +140,7 @@ func (gim *globalIdentityManager) ValidateToken(token string) (bool, error) {
 
 	var response validateTokenResponse
 
-	err = fromJson(&response, resp.Body)
+	err = core.FromJson(&response, resp.Body)
 	if err != nil {
 		return false, err
 	}
@@ -155,7 +156,7 @@ func (gim *globalIdentityManager) IsUserInRoles(userKey string, roles ...string)
 		UserKey:        userKey,
 		RoleCollection: roles,
 	}
-	json, err := toJson(request)
+	json, err := core.ToJson(request)
 	if err != nil {
 		return false, err
 	}
@@ -171,7 +172,7 @@ func (gim *globalIdentityManager) IsUserInRoles(userKey string, roles ...string)
 
 	var response isUserInRoleResponse
 
-	err = fromJson(&response, resp.Body)
+	err = core.FromJson(&response, resp.Body)
 	if err != nil {
 		return false, err
 	}
@@ -186,7 +187,7 @@ func (gim *globalIdentityManager) RenewToken(token string) (string, error) {
 		ApplicationKey: gim.applicationKey,
 		Token:          token,
 	}
-	json, err := toJson(request)
+	json, err := core.ToJson(request)
 	if err != nil {
 		return "", err
 	}
@@ -202,7 +203,7 @@ func (gim *globalIdentityManager) RenewToken(token string) (string, error) {
 
 	var response renewTokenResponse
 
-	err = fromJson(&response, resp.Body)
+	err = core.FromJson(&response, resp.Body)
 	if err != nil {
 		return "", err
 	}
@@ -220,7 +221,7 @@ func (gim *globalIdentityManager) ValidateApplication(clientApplicationKey strin
 		RawData:              rawData,
 		EncryptedData:        encryptedData,
 	}
-	json, err := toJson(request)
+	json, err := core.ToJson(request)
 	if err != nil {
 		return false, err
 	}
@@ -236,7 +237,7 @@ func (gim *globalIdentityManager) ValidateApplication(clientApplicationKey strin
 
 	var response validateApplicationResponse
 
-	err = fromJson(&response, resp.Body)
+	err = core.FromJson(&response, resp.Body)
 	if err != nil {
 		return false, err
 	}

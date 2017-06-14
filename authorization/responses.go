@@ -1,4 +1,4 @@
-package globalidentity
+package authorization
 
 type authenticateUserResponse struct {
 	AuthenticationToken      string                 `json:"AuthenticationToken"`
