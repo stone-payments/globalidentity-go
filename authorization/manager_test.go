@@ -65,7 +65,7 @@ func TestRecoverPasswordOk(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestGlobalIdentityManager_ValidateApplication(t *testing.T) {
+func ValidateApplication(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
