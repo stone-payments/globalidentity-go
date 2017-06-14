@@ -115,7 +115,7 @@ func TestGlobalIdentityManager_ValidateApplication(t *testing.T) {
 	}
 }
 
-func TestGlobalIdentityManager_AuthenticateUser(t *testing.T) {
+func TestAuthenticateUser(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -172,7 +172,7 @@ func TestGlobalIdentityManager_AuthenticateUser(t *testing.T) {
 	}
 }
 
-func TestGlobalIdentityManager_IsUserInRoles(t *testing.T) {
+func TestIsUserInRoles(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -222,7 +222,7 @@ func TestGlobalIdentityManager_IsUserInRoles(t *testing.T) {
 	}
 }
 
-func TestGlobalIdentityManager_ValidateToken(t *testing.T) {
+func TestValidateToken(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -272,7 +272,7 @@ func TestGlobalIdentityManager_ValidateToken(t *testing.T) {
 	}
 }
 
-func TestGlobalIdentityManager_RenewToken(t *testing.T) {
+func TestRenewToken(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
