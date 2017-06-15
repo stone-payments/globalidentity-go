@@ -17,6 +17,5 @@ func (r *responseProcessor) Process(resp *grequests.Response, data interface{}) 
 		return GlobalIdentityError([]string{fmt.Sprintf("%v", resp.StatusCode)})
 	}
 
-	resp.JSON(data)
-	return nil
+	return resp.JSON(data)
 }
