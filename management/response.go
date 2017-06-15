@@ -4,7 +4,7 @@ import core "globalidentity-go"
 
 type rolesResponse struct {
 	Roles []role `json:"roles"`
-	core.Response
+	*core.Response
 }
 
 type role struct {
