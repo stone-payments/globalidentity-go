@@ -1,13 +1,10 @@
 package management
 
-type response struct {
-	Success         bool          `json:"Success"`
-	OperationReport []interface{} `json:"OperationReport"`
-}
+import core "globalidentity-go"
 
 type rolesResponse struct {
 	Roles []role `json:"roles"`
-	response
+	core.Response
 }
 
 type role struct {
