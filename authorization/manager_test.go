@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	core "globalidentity-go"
+	core "github.com/stone-pagamentos/globalidentity-go"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 )

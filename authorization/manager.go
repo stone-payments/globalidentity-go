@@ -2,7 +2,7 @@ package authorization
 
 import (
 	"fmt"
-	core "globalidentity-go"
+	core "github.com/stone-pagamentos/globalidentity-go"
 	"net/http"
 )
 

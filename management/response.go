@@ -1,6 +1,6 @@
 package management
 
-import core "globalidentity-go"
+import core "github.com/stone-pagamentos/globalidentity-go"
 
 type rolesResponse struct {
 	Roles []role `json:"roles"`

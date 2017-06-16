@@ -2,7 +2,7 @@ package management
 
 import (
 	"fmt"
-	core "globalidentity-go"
+	core "github.com/stone-pagamentos/globalidentity-go"
 
 	"github.com/levigross/grequests"
 )
