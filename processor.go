@@ -14,7 +14,7 @@ type responseProcessor struct{}
 func (r *responseProcessor) Process(resp *grequests.Response, data interface{}) error {
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return GlobalIdentityError([]string{fmt.Sprintf("%v", resp.StatusCode)})
+		return GlobalIdentityError([]string{fmt.Sprintf("%d", resp.StatusCode)})
 	}
 
 	return resp.JSON(data)
