@@ -54,10 +54,8 @@ func (suite *UserRolesSuite) TestWrongResponse() {
 
 	roles, err := suite.manager.UserRoles("user")
 
-	_,ok := err.(core.GlobalIdentityError)
-
 	assert.Nil(suite.T(), roles)
-	assert.NotNil(suite.T(), ok)
+	assert.NotNil(suite.T(), err)
 }
 
 func (suite *UserRolesSuite) TestErrorResponse() {
@@ -71,7 +69,7 @@ func (suite *UserRolesSuite) TestErrorResponse() {
 	_,ok := err.(core.GlobalIdentityError)
 
 	assert.Nil(suite.T(), roles)
-	assert.NotNil(suite.T(), ok)
+	assert.True(suite.T(), ok)
 }
 
 func (suite *UserRolesSuite) TestFailedResponse() {
@@ -85,5 +83,5 @@ func (suite *UserRolesSuite) TestFailedResponse() {
 	_,ok := err.(core.GlobalIdentityError)
 
 	assert.Nil(suite.T(), roles)
-	assert.NotNil(suite.T(), ok)
+	assert.True(suite.T(), ok)
 }
