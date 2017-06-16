@@ -7,6 +7,7 @@ import (
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	core "github.com/stone-pagamentos/globalidentity-go"
 )
 
 type UserRolesSuite struct {
@@ -53,8 +54,10 @@ func (suite *UserRolesSuite) TestWrongResponse() {
 
 	roles, err := suite.manager.UserRoles("user")
 
+	_,ok := err.(core.GlobalIdentityError)
+
 	assert.Nil(suite.T(), roles)
-	assert.NotNil(suite.T(), err)
+	assert.NotNil(suite.T(), ok)
 }
 
 func (suite *UserRolesSuite) TestErrorResponse() {
@@ -65,8 +68,10 @@ func (suite *UserRolesSuite) TestErrorResponse() {
 
 	roles, err := suite.manager.UserRoles("user")
 
+	_,ok := err.(core.GlobalIdentityError)
+
 	assert.Nil(suite.T(), roles)
-	assert.NotNil(suite.T(), err)
+	assert.NotNil(suite.T(), ok)
 }
 
 func (suite *UserRolesSuite) TestFailedResponse() {
@@ -77,6 +82,8 @@ func (suite *UserRolesSuite) TestFailedResponse() {
 
 	roles, err := suite.manager.UserRoles("user")
 
+	_,ok := err.(core.GlobalIdentityError)
+
 	assert.Nil(suite.T(), roles)
-	assert.NotNil(suite.T(), err)
+	assert.NotNil(suite.T(), ok)
 }

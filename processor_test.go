@@ -26,5 +26,7 @@ func (suite *ResponseProcessorSuite) TestBadStatus() {
 
 	err := ResponseProcessor.Process(suite.badStatusResponse, response)
 
-	assert.NotNil(suite.T(), err)
+	_,ok := err.(GlobalIdentityError)
+
+	assert.True(suite.T(), ok)
 }
