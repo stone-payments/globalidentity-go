@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"testing"
 
-	core "github.com/stone-pagamentos/globalidentity-go"
 	"github.com/jarcoal/httpmock"
+	core "github.com/stone-pagamentos/globalidentity-go"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -77,7 +77,7 @@ func ValidateApplication(t *testing.T) {
 		t.FailNow()
 	}
 
-	okResponse, _ := json.Marshal(&validateApplicationResponse{
+	okResponse, _ := json.Marshal(&core.Response{
 		Success:         true,
 		OperationReport: make([]string, 0),
 	})
@@ -90,7 +90,7 @@ func ValidateApplication(t *testing.T) {
 		t.FailNow()
 	}
 
-	notOkResponse, _ := json.Marshal(&validateApplicationResponse{
+	notOkResponse, _ := json.Marshal(&core.Response{
 		Success:         false,
 		OperationReport: []string{"error"},
 	})
@@ -184,7 +184,7 @@ func TestIsUserInRoles(t *testing.T) {
 		t.FailNow()
 	}
 
-	okResponse, _ := json.Marshal(&isUserInRoleResponse{
+	okResponse, _ := json.Marshal(&core.Response{
 		Success:         true,
 		OperationReport: make([]string, 0),
 	})
@@ -197,7 +197,7 @@ func TestIsUserInRoles(t *testing.T) {
 		t.FailNow()
 	}
 
-	notOkResponse, _ := json.Marshal(&isUserInRoleResponse{
+	notOkResponse, _ := json.Marshal(&core.Response{
 		Success:         false,
 		OperationReport: []string{"error"},
 	})
@@ -234,7 +234,7 @@ func TestValidateToken(t *testing.T) {
 		t.FailNow()
 	}
 
-	okResponse, _ := json.Marshal(&validateTokenResponse{
+	okResponse, _ := json.Marshal(&core.Response{
 		Success:         true,
 		OperationReport: make([]string, 0),
 	})
@@ -247,7 +247,7 @@ func TestValidateToken(t *testing.T) {
 		t.FailNow()
 	}
 
-	notOkResponse, _ := json.Marshal(&validateTokenResponse{
+	notOkResponse, _ := json.Marshal(&core.Response{
 		Success:         false,
 		OperationReport: []string{"error"},
 	})
@@ -284,7 +284,7 @@ func TestRenewToken(t *testing.T) {
 		t.FailNow()
 	}
 
-	okResponse, _ := json.Marshal(&validateTokenResponse{
+	okResponse, _ := json.Marshal(&core.Response{
 		Success:         true,
 		OperationReport: make([]string, 0),
 	})
@@ -298,9 +298,11 @@ func TestRenewToken(t *testing.T) {
 	}
 
 	notOkResponse, _ := json.Marshal(&renewTokenResponse{
-		Success:         false,
-		NewToken:        "token",
-		OperationReport: []string{"error"},
+		NewToken: "token",
+		Response: core.Response{
+			Success:         false,
+			OperationReport: []string{"error"},
+		},
 	})
 
 	httpmock.RegisterResponder("POST", renewTokenUrl, httpmock.NewStringResponder(http.StatusOK, string(notOkResponse)))

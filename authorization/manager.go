@@ -1,9 +1,7 @@
 package authorization
 
 import (
-	"fmt"
 	core "github.com/stone-pagamentos/globalidentity-go"
-	"net/http"
 )
 
 type GlobalIdentityManager interface {
@@ -18,12 +16,14 @@ type GlobalIdentityManager interface {
 type globalIdentityManager struct {
 	applicationKey     string
 	globalIdentityHost string
+	requester          core.Requester
 }
 
 func New(applicationKey string, globalIdentityHost string) GlobalIdentityManager {
 	return &globalIdentityManager{
 		applicationKey,
 		globalIdentityHost,
+		core.NewRequester(),
 	}
 }
 
@@ -35,22 +35,30 @@ func (gim *globalIdentityManager) AuthenticateUser(email string, password string
 		Email:    email,
 		Password: password,
 	}
-	json, err := core.ToJson(request)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := http.Post(gim.globalIdentityHost+authenticateUserSuffix, contentJson, json)
+
+	requestOptions := gim.requestOptions()
+	requestOptions.JSON = request
+
+	resp, err := gim.requester.Post(gim.globalIdentityHost+authenticateUserSuffix, requestOptions)
+
 	if err != nil {
 		return nil, err
 	}
 
 	var response authenticateUserResponse
+	err = resp.JSON(&response)
 
-	err = core.FromJson(&response, resp.Body)
 	if err != nil {
 		return nil, err
 	}
-	if !response.Success {
+
+	var globalIdentityUser *core.Authorization
+	if response.Success {
+		globalIdentityUser = &core.Authorization{
+			Token: response.AuthenticationToken,
+			Key:   response.UserKey,
+		}
+	} else {
 		var messages []string
 		for _, operationReport := range response.OperationReport {
 			messages = append(messages, operationReport.Message)
@@ -58,10 +66,7 @@ func (gim *globalIdentityManager) AuthenticateUser(email string, password string
 		err = core.GlobalIdentityError(messages)
 	}
 
-	var globalIdentityUser core.Authorization
-	globalIdentityUser.Token = response.AuthenticationToken
-	globalIdentityUser.Key = response.UserKey
-	return &globalIdentityUser, err
+	return globalIdentityUser, err
 }
 
 func (gim *globalIdentityManager) RecoverPassword(email string) (bool, error) {
@@ -70,29 +75,22 @@ func (gim *globalIdentityManager) RecoverPassword(email string) (bool, error) {
 		Email:          email,
 	}
 
-	json, err := core.ToJson(request)
+	requestOptions := gim.requestOptions()
+	requestOptions.JSON = request
+
+	resp, err := gim.requester.Post(gim.globalIdentityHost+recoverPasswordSuffix, requestOptions)
+
 	if err != nil {
 		return false, err
 	}
 
-	resp, err := http.Post(gim.globalIdentityHost+recoverPasswordSuffix, contentJson, json)
-	if err != nil {
+	var response core.Response
+	if err = resp.JSON(&response); err != nil {
 		return false, err
 	}
 
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return false, core.GlobalIdentityError([]string{fmt.Sprintf("%v", resp.StatusCode)})
-	}
-
-	var response recoverPasswordResponse
-
-	err = core.FromJson(&response, resp.Body)
-	if err != nil {
+	if err = response.Validate(); err != nil {
 		return false, err
-	}
-
-	if len(response.OperationReport) > 0 {
-		err = core.GlobalIdentityError(response.OperationReport)
 	}
 
 	return response.Success, err
@@ -103,29 +101,24 @@ func (gim *globalIdentityManager) ValidateToken(token string) (bool, error) {
 		ApplicationKey: gim.applicationKey,
 		Token:          token,
 	}
-	json, err := core.ToJson(request)
+
+	requestOptions := gim.requestOptions()
+	requestOptions.JSON = request
+
+	resp, err := gim.requester.Post(gim.globalIdentityHost+validateTokenSuffix, requestOptions)
 	if err != nil {
 		return false, err
 	}
 
-	resp, err := http.Post(gim.globalIdentityHost+validateTokenSuffix, contentJson, json)
-	if err != nil {
+	var response core.Response
+	if err = resp.JSON(&response); err != nil {
 		return false, err
 	}
 
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return false, core.GlobalIdentityError([]string{fmt.Sprintf("%v", resp.StatusCode)})
-	}
-
-	var response validateTokenResponse
-
-	err = core.FromJson(&response, resp.Body)
-	if err != nil {
+	if err = response.Validate(); err != nil {
 		return false, err
 	}
-	if !response.Success {
-		err = core.GlobalIdentityError(response.OperationReport)
-	}
+
 	return response.Success, err
 }
 
@@ -135,29 +128,24 @@ func (gim *globalIdentityManager) IsUserInRoles(userKey string, roles ...string)
 		UserKey:        userKey,
 		RoleCollection: roles,
 	}
-	json, err := core.ToJson(request)
+
+	requestOptions := gim.requestOptions()
+	requestOptions.JSON = request
+
+	resp, err := gim.requester.Post(gim.globalIdentityHost+isUserInRolesSuffix, requestOptions)
 	if err != nil {
 		return false, err
 	}
 
-	resp, err := http.Post(gim.globalIdentityHost+isUserInRolesSuffix, contentJson, json)
-	if err != nil {
+	var response core.Response
+	if err = resp.JSON(&response); err != nil {
 		return false, err
 	}
 
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return false, core.GlobalIdentityError([]string{fmt.Sprintf("%v", resp.StatusCode)})
-	}
-
-	var response isUserInRoleResponse
-
-	err = core.FromJson(&response, resp.Body)
-	if err != nil {
+	if err = response.Validate(); err != nil {
 		return false, err
 	}
-	if !response.Success {
-		err = core.GlobalIdentityError(response.OperationReport)
-	}
+
 	return response.Success, err
 }
 
@@ -166,29 +154,23 @@ func (gim *globalIdentityManager) RenewToken(token string) (string, error) {
 		ApplicationKey: gim.applicationKey,
 		Token:          token,
 	}
-	json, err := core.ToJson(request)
+	requestOptions := gim.requestOptions()
+	requestOptions.JSON = request
+
+	resp, err := gim.requester.Post(gim.globalIdentityHost+renewTokenSuffix, requestOptions)
 	if err != nil {
 		return "", err
-	}
-
-	resp, err := http.Post(gim.globalIdentityHost+renewTokenSuffix, contentJson, json)
-	if err != nil {
-		return "", err
-	}
-
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return "", core.GlobalIdentityError([]string{fmt.Sprintf("%v", resp.StatusCode)})
 	}
 
 	var response renewTokenResponse
-
-	err = core.FromJson(&response, resp.Body)
-	if err != nil {
+	if err = resp.JSON(&response); err != nil {
 		return "", err
 	}
-	if !response.Success {
-		err = core.GlobalIdentityError(response.OperationReport)
+
+	if err = response.Validate(); err != nil {
+		return "", err
 	}
+
 	return response.NewToken, err
 }
 
@@ -200,28 +182,31 @@ func (gim *globalIdentityManager) ValidateApplication(clientApplicationKey strin
 		RawData:              rawData,
 		EncryptedData:        encryptedData,
 	}
-	json, err := core.ToJson(request)
+	requestOptions := gim.requestOptions()
+	requestOptions.JSON = request
+
+	resp, err := gim.requester.Post(gim.globalIdentityHost+validateApplicationSuffix, requestOptions)
 	if err != nil {
 		return false, err
 	}
 
-	resp, err := http.Post(gim.globalIdentityHost+validateApplicationSuffix, contentJson, json)
-	if err != nil {
+	var response core.Response
+	if err = resp.JSON(&response); err != nil {
 		return false, err
 	}
 
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return false, core.GlobalIdentityError([]string{fmt.Sprintf("%v", resp.StatusCode)})
-	}
-
-	var response validateApplicationResponse
-
-	err = core.FromJson(&response, resp.Body)
-	if err != nil {
+	if err = response.Validate(); err != nil {
 		return false, err
 	}
-	if !response.Success {
-		err = core.GlobalIdentityError(response.OperationReport)
-	}
+
 	return response.Success, err
+}
+
+func (gim *globalIdentityManager) requestOptions() *core.RequestOptions {
+	ro := new(core.RequestOptions)
+	ro.Headers = map[string]string{
+		"Accept":       contentJson,
+		"Content-Type": contentJson,
+	}
+	return ro
 }
