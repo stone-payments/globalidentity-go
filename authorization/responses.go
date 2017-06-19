@@ -1,5 +1,7 @@
 package authorization
 
+import core "github.com/stone-pagamentos/globalidentity-go"
+
 type authenticateUserResponse struct {
 	AuthenticationToken      string                 `json:"AuthenticationToken"`
 	TokenExpirationInMinutes int                    `json:"TokenExpirationInMinutes"`
@@ -14,37 +16,8 @@ type loginOperationReport struct {
 	Message string `json:"Message"`
 }
 
-type validateTokenResponse struct {
-	ExpirationInMinutes int      `json:"ExpirationInMinutes"`
-	Success             bool     `json:"Success"`
-	OperationReport     []string `json:"OperationReport"`
-}
-
-type recoverPasswordResponse struct {
-	Success         bool     `json:"Success"`
-	OperationReport []string `json:"OperationReport"`
-}
-
 type renewTokenResponse struct {
 	NewToken            string   `json:"NewToken"`
 	ExpirationInMinutes int      `json:"ExpirationInMinutes"`
-	Success             bool     `json:"Success"`
-	OperationReport     []string `json:"OperationReport"`
-}
-
-type renewToken struct {
-	NewToken            string   `json:"NewToken"`
-	ExpirationInMinutes int      `json:"ExpirationInMinutes"`
-	Success             bool     `json:"Success"`
-	OperationReport     []string `json:"OperationReport"`
-}
-
-type validateApplicationResponse struct {
-	Success         bool     `json:"Success"`
-	OperationReport []string `json:"OperationReport"`
-}
-
-type isUserInRoleResponse struct {
-	Success         bool     `json:"Success"`
-	OperationReport []string `json:"OperationReport"`
+	core.Response
 }
