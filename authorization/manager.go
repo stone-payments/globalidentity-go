@@ -1,7 +1,7 @@
 package authorization
 
 import (
-	core "github.com/stone-pagamentos/globalidentity-go"
+	core "github.com/stone-payments/globalidentity-go"
 )
 
 type GlobalIdentityManager interface {

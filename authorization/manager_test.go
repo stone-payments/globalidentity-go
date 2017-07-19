@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/jarcoal/httpmock"
-	core "github.com/stone-pagamentos/globalidentity-go"
+	core "github.com/stone-payments/globalidentity-go"
 	"github.com/stretchr/testify/assert"
 )
 
