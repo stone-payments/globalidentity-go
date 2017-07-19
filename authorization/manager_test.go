@@ -15,7 +15,7 @@ const (
 	validateApplicationUrl = "https://dlpgi.dlp-payments.com/api/authorization/validateapplication"
 	authenticateUserUrl    = "https://dlpgi.dlp-payments.com/api/authorization/authenticate"
 	isUserInRolesUrl       = "https://dlpgi.dlp-payments.com/api/authorization/isuserinroles"
-	validateTokenUrl       = "https://dlpgi.dlp-payments.com/api/authorization/validatetokenresponse"
+	validateTokenUrl       = "https://dlpgi.dlp-payments.com/api/authorization/validateToken"
 	renewTokenUrl          = "https://dlpgi.dlp-payments.com/api/authorization/renewtoken"
 	recoverPasswordUrl     = "https://dlpgi.dlp-payments.com/api/authorization/recoverPassword"
 )
