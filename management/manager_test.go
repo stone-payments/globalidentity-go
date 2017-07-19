@@ -7,7 +7,7 @@ import (
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	core "github.com/stone-pagamentos/globalidentity-go"
+	core "github.com/stone-payments/globalidentity-go"
 )
 
 type UserRolesSuite struct {

@@ -1,6 +1,6 @@
 package authorization
 
-import core "github.com/stone-pagamentos/globalidentity-go"
+import core "github.com/stone-payments/globalidentity-go"
 
 type authenticateUserResponse struct {
 	AuthenticationToken      string                 `json:"AuthenticationToken"`
