@@ -4,7 +4,7 @@
 ## Instalação
 
 ```go
-go get github.com/stone-pagamentos/globalidentity-go
+go get github.com/stone-payments/globalidentity-go
 ```
 
 ## Funcionalidades
