@@ -23,3 +23,12 @@ type usersResponse struct {
 	Roles     []string `json:"roles"`
 	*core.Response
 }
+
+type listUsersResponse struct {
+	Users     []core.User `json:"users"`
+	FirstPage int `json:"FirstPage"`
+	NextPage  int `json:"NextPage"`
+	LastPage  int `json:"LastPage"`
+	TotalRows int `json:"TotalRows"`
+	*core.Response
+}
