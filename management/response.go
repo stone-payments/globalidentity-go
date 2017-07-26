@@ -13,17 +13,6 @@ type role struct {
 	Active      bool   `json:"active"`
 }
 
-type usersResponse struct {
-	UserKey   string   `json:"userKey"`
-	Email     string   `json:"email"`
-	Name      string   `json:"name"`
-	Comment   string   `json:"comment"`
-	Active    bool     `json:"active"`
-	LockedOut bool     `json:"lockedOut"`
-	Roles     []string `json:"roles"`
-	*core.Response
-}
-
 type listUsersResponse struct {
 	Users     []core.User `json:"users"`
 	FirstPage int `json:"FirstPage"`
