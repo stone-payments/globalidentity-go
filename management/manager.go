@@ -73,7 +73,6 @@ func (gim *globalIdentityManager) ListUsers(pageNumber, pageSize int, includeRol
 	if err = resp.JSON(&response); err != nil {
 		return nil, err
 	}
-	println(response.Success)
 	if err = response.Validate(); err != nil {
 		return nil, err
 	}
