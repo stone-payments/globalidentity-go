@@ -2,6 +2,7 @@ package management
 
 import (
 	"fmt"
+
 	core "github.com/stone-payments/globalidentity-go"
 )
 
@@ -13,7 +14,7 @@ type globalIdentityManager struct {
 	applicationKey     string
 	apiKey             string
 	globalIdentityHost string
-	requester 		   core.Requester
+	requester          core.Requester
 }
 
 func New(applicationKey string, apiKey string, globalIdentityHost string) GlobalIdentityManager {
@@ -57,12 +58,44 @@ func (gim *globalIdentityManager) UserRoles(email string) ([]core.Role, error) {
 	return roles, nil
 }
 
-func (gim *globalIdentityManager) requestOptions() *core.RequestOptions {
-	ro := new(core.RequestOptions) 
-	ro.Headers = map[string]string{
-			"Accept": contentJSON,
-			"Authorization": "bearer " + gim.apiKey,
-			"Content-Type":  contentJSON,
+func (gim *globalIdentityManager) ListUsers(pageNumber int, pageSize int, includeRoles bool) ([]core.Role, error) {
+
+	url := fmt.Sprintf(gim.globalIdentityHost+listUsers, gim.applicationKey, pageNumber, pageSize, includeRoles)
+
+	resp, err := gim.requester.Get(url, gim.requestOptions())
+
+	if err != nil {
+		return nil, err
+	}
+
+	response := new(rolesResponse)
+	if err = resp.JSON(&response); err != nil {
+		return nil, err
+	}
+
+	if err = response.Validate(); err != nil {
+		return nil, err
+	}
+
+	roles := make([]core.Role, len(response.Roles))
+
+	for i, role := range response.Roles {
+		roles[i] = core.Role{
+			Name:        role.RoleName,
+			Description: role.Description,
+			Active:      role.Active,
 		}
+	}
+
+	return roles, nil
+}
+
+func (gim *globalIdentityManager) requestOptions() *core.RequestOptions {
+	ro := new(core.RequestOptions)
+	ro.Headers = map[string]string{
+		"Accept":        contentJSON,
+		"Authorization": "bearer " + gim.apiKey,
+		"Content-Type":  contentJSON,
+	}
 	return ro
 }

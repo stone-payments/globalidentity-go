@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/jarcoal/httpmock"
+	core "github.com/stone-payments/globalidentity-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	core "github.com/stone-payments/globalidentity-go"
 )
 
 type UserRolesSuite struct {
@@ -66,7 +66,7 @@ func (suite *UserRolesSuite) TestErrorResponse() {
 
 	roles, err := suite.manager.UserRoles("user")
 
-	_,ok := err.(core.GlobalIdentityError)
+	_, ok := err.(core.GlobalIdentityError)
 
 	assert.Nil(suite.T(), roles)
 	assert.True(suite.T(), ok)
@@ -80,7 +80,7 @@ func (suite *UserRolesSuite) TestFailedResponse() {
 
 	roles, err := suite.manager.UserRoles("user")
 
-	_,ok := err.(core.GlobalIdentityError)
+	_, ok := err.(core.GlobalIdentityError)
 
 	assert.Nil(suite.T(), roles)
 	assert.True(suite.T(), ok)
