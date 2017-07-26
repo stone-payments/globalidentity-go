@@ -8,6 +8,7 @@ import (
 	core "github.com/stone-payments/globalidentity-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	"github.com/fortytw2/leaktest"
 )
 
 type ManagementSuite struct {
@@ -39,8 +40,10 @@ func (suite *ManagementSuite) SetupTest() {
 }
 
 func (suite *ManagementSuite) TestUserRolesOk() {
+	defer leaktest.Check(suite.T())()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
+
 
 	httpmock.RegisterResponder("GET", suite.userRolesUrl, suite.okUserRolesResponder)
 
@@ -51,6 +54,7 @@ func (suite *ManagementSuite) TestUserRolesOk() {
 }
 
 func (suite *ManagementSuite) TestUserRolesWrongResponse() {
+	defer leaktest.Check(suite.T())()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -63,6 +67,7 @@ func (suite *ManagementSuite) TestUserRolesWrongResponse() {
 }
 
 func (suite *ManagementSuite) TestUserRolesErrorResponse() {
+	defer leaktest.Check(suite.T())()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -77,6 +82,7 @@ func (suite *ManagementSuite) TestUserRolesErrorResponse() {
 }
 
 func (suite *ManagementSuite) TestUserRolesFailedResponse() {
+	defer leaktest.Check(suite.T())()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -91,6 +97,7 @@ func (suite *ManagementSuite) TestUserRolesFailedResponse() {
 }
 
 func (suite *ManagementSuite) TestListUsersOk() {
+	defer leaktest.Check(suite.T())()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -103,6 +110,7 @@ func (suite *ManagementSuite) TestListUsersOk() {
 }
 
 func (suite *ManagementSuite) TestListUsersWrongResponse() {
+	defer leaktest.Check(suite.T())()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -115,6 +123,7 @@ func (suite *ManagementSuite) TestListUsersWrongResponse() {
 }
 
 func (suite *ManagementSuite) TestListUsersErrorResponse() {
+	defer leaktest.Check(suite.T())()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -129,6 +138,7 @@ func (suite *ManagementSuite) TestListUsersErrorResponse() {
 }
 
 func (suite *ManagementSuite) TestListUsersFailedResponse() {
+	defer leaktest.Check(suite.T())()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
