@@ -18,7 +18,7 @@ type User struct {
 	Comment   string `json:"comment"`
 	Active    bool `json:"active"`
 	LockedOut bool `json:"lockedOut"`
-	Roles     []string `json:"roles"`
+	Roles     []string `json:"roles,omitempty"`
 }
 
 type ListUsersResponse struct {
