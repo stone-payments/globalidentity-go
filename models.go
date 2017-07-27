@@ -20,3 +20,12 @@ type User struct {
 	LockedOut bool `json:"lockedOut"`
 	Roles     []string `json:"roles"`
 }
+
+type ListUsersResponse struct {
+	Users     []User `json:"users"`
+	FirstPage int `json:"FirstPage"`
+	NextPage  int `json:"NextPage"`
+	LastPage  int `json:"LastPage"`
+	TotalRows int `json:"TotalRows"`
+	*Response
+}

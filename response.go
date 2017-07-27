@@ -3,7 +3,7 @@ package globalidentity
 // Response is the base response of Global Identity.
 type Response struct {
 	Success         bool     `json:"Success"`
-	OperationReport []string `json:"OperationReport"`
+	OperationReport []string `json:"OperationReport,omitempty"`
 }
 
 // Validate checks success of response.

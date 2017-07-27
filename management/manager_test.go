@@ -105,7 +105,7 @@ func (suite *ManagementSuite) TestListUsersOk() {
 
 	users, err := suite.manager.ListUsers(1, 1, true)
 
-	assert.True(suite.T(), len(users) > 0)
+	assert.True(suite.T(), len(users.Users) > 0)
 	assert.Nil(suite.T(), err)
 }
 
