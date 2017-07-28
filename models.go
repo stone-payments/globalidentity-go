@@ -18,5 +18,14 @@ type User struct {
 	Comment   string `json:"comment"`
 	Active    bool `json:"active"`
 	LockedOut bool `json:"lockedOut"`
-	Roles     []string `json:"roles"`
+	Roles     []string `json:"roles,omitempty"`
+}
+
+type ListUsersResponse struct {
+	Users     []User `json:"users"`
+	FirstPage int `json:"FirstPage"`
+	NextPage  int `json:"NextPage"`
+	LastPage  int `json:"LastPage"`
+	TotalRows int `json:"TotalRows"`
+	*Response
 }

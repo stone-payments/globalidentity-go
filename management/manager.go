@@ -8,7 +8,7 @@ import (
 
 type GlobalIdentityManager interface {
 	UserRoles(email string) ([]core.Role, error)
-	ListUsers(pageNumber, pageSize int, includeRoles bool) ([]core.User, error)
+	ListUsers(pageNumber, pageSize int, includeRoles bool) (*core.ListUsersResponse, error)
 }
 
 type globalIdentityManager struct {
@@ -59,7 +59,7 @@ func (gim *globalIdentityManager) UserRoles(email string) ([]core.Role, error) {
 	return roles, nil
 }
 
-func (gim *globalIdentityManager) ListUsers(pageNumber, pageSize int, includeRoles bool) ([]core.User, error) {
+func (gim *globalIdentityManager) ListUsers(pageNumber, pageSize int, includeRoles bool) (*core.ListUsersResponse, error) {
 
 	url := fmt.Sprintf(gim.globalIdentityHost+listUsers, gim.applicationKey, pageNumber, pageSize, includeRoles)
 
@@ -69,7 +69,7 @@ func (gim *globalIdentityManager) ListUsers(pageNumber, pageSize int, includeRol
 		return nil, err
 	}
 
-	response := new(listUsersResponse)
+	response := new(core.ListUsersResponse)
 	if err = resp.JSON(&response); err != nil {
 		return nil, err
 	}
@@ -77,21 +77,7 @@ func (gim *globalIdentityManager) ListUsers(pageNumber, pageSize int, includeRol
 		return nil, err
 	}
 
-	users := make([]core.User, len(response.Users))
-
-	for i, user := range response.Users {
-		users[i] = core.User{
-			Name:      user.Name,
-			Active:    user.Active,
-			Roles:     user.Roles,
-			Email:     user.Email,
-			Comment:   user.Comment,
-			LockedOut: user.LockedOut,
-			UserKey:   user.UserKey,
-		}
-	}
-
-	return users, nil
+	return response, nil
 }
 
 func (gim *globalIdentityManager) requestOptions() *core.RequestOptions {
