@@ -8,6 +8,7 @@ import (
 	"github.com/jarcoal/httpmock"
 	core "github.com/stone-payments/globalidentity-go"
 	"github.com/stretchr/testify/assert"
+	"github.com/fortytw2/leaktest"
 )
 
 const (
@@ -21,6 +22,7 @@ const (
 )
 
 func TestRecoverPasswordWrongStatusCode(t *testing.T) {
+	defer leaktest.Check(t)()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -32,6 +34,7 @@ func TestRecoverPasswordWrongStatusCode(t *testing.T) {
 }
 
 func TestRecoverPasswordWrongResponse(t *testing.T) {
+	defer leaktest.Check(t)()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -43,6 +46,7 @@ func TestRecoverPasswordWrongResponse(t *testing.T) {
 }
 
 func TestRecoverPasswordWithOperationReport(t *testing.T) {
+	defer leaktest.Check(t)()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -54,6 +58,7 @@ func TestRecoverPasswordWithOperationReport(t *testing.T) {
 }
 
 func TestRecoverPasswordOk(t *testing.T) {
+	defer leaktest.Check(t)()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -65,7 +70,8 @@ func TestRecoverPasswordOk(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func ValidateApplication(t *testing.T) {
+func TestValidateApplication(t *testing.T) {
+	defer leaktest.Check(t)()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -116,6 +122,7 @@ func ValidateApplication(t *testing.T) {
 }
 
 func TestAuthenticateUser(t *testing.T) {
+	defer leaktest.Check(t)()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -173,6 +180,7 @@ func TestAuthenticateUser(t *testing.T) {
 }
 
 func TestIsUserInRoles(t *testing.T) {
+	defer leaktest.Check(t)()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -223,6 +231,7 @@ func TestIsUserInRoles(t *testing.T) {
 }
 
 func TestValidateToken(t *testing.T) {
+	defer leaktest.Check(t)()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -273,6 +282,7 @@ func TestValidateToken(t *testing.T) {
 }
 
 func TestRenewToken(t *testing.T) {
+	defer leaktest.Check(t)()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 

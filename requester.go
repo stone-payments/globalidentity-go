@@ -1,6 +1,6 @@
 package globalidentity
 
-import 	(
+import (
 	"github.com/levigross/grequests"
 	"fmt"
 )
@@ -14,29 +14,29 @@ type Requester interface {
 	Get(url string, requestOptions *RequestOptions) (*HttpResponse, error)
 }
 
-type requester struct {}
+type requester struct{}
 
 type RequestOptions struct {
 	grequests.RequestOptions
 }
 
-func (r requester) Post(url string, ro *RequestOptions) (*HttpResponse, error){
+func (r requester) Post(url string, ro *RequestOptions) (*HttpResponse, error) {
 	response, err := grequests.Post(url, &ro.RequestOptions)
 
-	if (err == nil) {
-		err = r.processResponse(&HttpResponse{Response:response})
+	if err == nil {
+		err = r.processResponse(&HttpResponse{Response: response})
 	}
 
-	return &HttpResponse{Response:response}, err
+	return &HttpResponse{Response: response}, err
 }
-func (r requester) Get(url string, ro *RequestOptions) (*HttpResponse, error){
+func (r requester) Get(url string, ro *RequestOptions) (*HttpResponse, error) {
 	response, err := grequests.Get(url, &ro.RequestOptions)
 
-	if (err == nil) {
-		err = r.processResponse(&HttpResponse{Response:response})
+	if err == nil {
+		err = r.processResponse(&HttpResponse{Response: response})
 	}
 
-	return &HttpResponse{Response:response}, err
+	return &HttpResponse{Response: response}, err
 }
 
 func (r *requester) processResponse(resp *HttpResponse) error {
@@ -48,7 +48,6 @@ func (r *requester) processResponse(resp *HttpResponse) error {
 	return nil
 }
 
-
-func NewRequester () Requester {
+func NewRequester() Requester {
 	return requester{}
 }
