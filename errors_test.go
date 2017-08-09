@@ -1,8 +1,8 @@
 package globalidentity
 
 import (
-	"testing"
 	"github.com/fortytw2/leaktest"
+	"testing"
 )
 
 func TestGlobalIdentityError_Error(t *testing.T) {

@@ -32,8 +32,8 @@ func (gim *globalIdentityManager) AuthenticateUser(email string, password string
 	request := &authenticateUserRequest{
 		ApplicationKey:           gim.applicationKey,
 		TokenExpirationInMinutes: expirationInMinutes[0],
-		Email:                    email,
-		Password:                 password,
+		Email:    email,
+		Password: password,
 	}
 
 	requestOptions := gim.requestOptions()
