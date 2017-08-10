@@ -17,7 +17,7 @@ type loginOperationReport struct {
 }
 
 type renewTokenResponse struct {
-	NewToken            string   `json:"NewToken"`
-	ExpirationInMinutes int      `json:"ExpirationInMinutes"`
+	NewToken            string `json:"NewToken"`
+	ExpirationInMinutes int    `json:"ExpirationInMinutes"`
 	core.Response
 }
