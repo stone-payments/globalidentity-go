@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/fortytw2/leaktest"
 	"github.com/jarcoal/httpmock"
 	core "github.com/stone-payments/globalidentity-go"
 	"github.com/stretchr/testify/assert"
-	"github.com/fortytw2/leaktest"
 )
 
 const (

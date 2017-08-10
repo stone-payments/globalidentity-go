@@ -1,8 +1,8 @@
 package globalidentity
 
 import (
-	"github.com/levigross/grequests"
 	"fmt"
+	"github.com/levigross/grequests"
 )
 
 type HttpResponse struct {
