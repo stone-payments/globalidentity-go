@@ -6,7 +6,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  Github.Project.Path: "github.com/stone-payments/go-logging"
+  Github.Project.Path: "github.com/stone-payments/globalidentity-go"
   modulePath: "$(Agent.WorkFolder)/src/$(Github.Project.Path)/"
 
 steps:
