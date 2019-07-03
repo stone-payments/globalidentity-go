@@ -1,0 +1,59 @@
+trigger:
+- master
+- develop
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  Github.Project.Path: "github.com/stone-payments/go-logging"
+  modulePath: "$(Agent.WorkFolder)/src/$(Github.Project.Path)/"
+
+steps:
+  - task: GoTool@0
+    displayName: 'Use Go 1.10.4'
+    inputs:
+      version: 1.10.4
+      goPath: '$(Agent.WorkFolder)'
+      goBin: '$(Agent.WorkFolder)/bin'
+
+  - bash: |
+      git config --global url."https://github.com".insteadOf git://github.com
+      git config --global url."https://github.com/".insteadOf git@github.com:
+      git config --global url."https://".insteadOf git://
+      git config --global credential.helper store
+      cd ~
+      echo "https://$(Github.Token):x-oauth-basic@github.com" > .git-credentials
+    displayName: 'Set .git-credentials'
+
+  - task: CopyFiles@2
+    inputs:
+      sourceFolder: "$(System.DefaultWorkingDirectory)"
+      targetFolder: "$(Agent.WorkFolder)/src/$(Github.Project.Path)"
+
+  - bash: |
+      mkdir $(Agent.WorkFolder)/bin
+    workingDirectory: '$(modulePath)'
+    displayName: 'Setup Go installation'
+
+  - bash: |
+      export PATH=$PATH:$(Agent.WorkFolder)/bin
+      curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+      $(Agent.WorkFolder)/bin/dep ensure -v --vendor-only
+    workingDirectory: '$(modulePath)'
+    displayName: 'dep ensure'
+
+  - bash: |
+      GOCACHE=off go test ./...
+    workingDirectory: '$(modulePath)'
+    displayName: 'Run Tests'
+
+  - bash: |
+      curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.16.0
+    workingDirectory: '$(modulePath)'
+    displayName: 'Install lint'
+
+  - bash: |
+      $(Agent.WorkFolder)/bin/golangci-lint run -c .golangci.yml
+    workingDirectory: '$(modulePath)'
+    displayName: 'Run lint'
