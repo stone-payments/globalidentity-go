@@ -50,7 +50,7 @@ func TestRecoverPasswordWithOperationReport(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	httpmock.RegisterResponder("POST", recoverPasswordUrl, httpmock.NewStringResponder(http.StatusOK, `{"Success": false, "OperationReport": ["test", "mock"]}`))
+	httpmock.RegisterResponder("POST", recoverPasswordUrl, httpmock.NewStringResponder(http.StatusOK, `{"Success": false, "OperationReport": [{"test": "mock"}]}`))
 
 	gim := New("test", globalApplicationUrl)
 	_, err := gim.RecoverPassword("test@test.com.br")
@@ -84,9 +84,12 @@ func TestValidateApplication(t *testing.T) {
 	}
 
 	okResponse, _ := json.Marshal(&core.Response{
-		Success:         true,
-		OperationReport: make([]string, 0),
-	})
+		Success: true,
+		OperationReport: make([]struct {
+			Field     string `json:"Field"`
+			Message   string `json:"Message"`
+			ErrorCode int    `json:"ErrorCode"`
+		}, 0)})
 
 	httpmock.RegisterResponder("POST", validateApplicationUrl, httpmock.NewStringResponder(http.StatusOK, string(okResponse)))
 
@@ -97,8 +100,14 @@ func TestValidateApplication(t *testing.T) {
 	}
 
 	notOkResponse, _ := json.Marshal(&core.Response{
-		Success:         false,
-		OperationReport: []string{"error"},
+		Success: false,
+		OperationReport: []struct {
+			Field     string `json:"Field"`
+			Message   string `json:"Message"`
+			ErrorCode int    `json:"ErrorCode"`
+		}{
+			{Message: "error"},
+		},
 	})
 
 	httpmock.RegisterResponder("POST", validateApplicationUrl, httpmock.NewStringResponder(http.StatusOK, string(notOkResponse)))
@@ -193,8 +202,12 @@ func TestIsUserInRoles(t *testing.T) {
 	}
 
 	okResponse, _ := json.Marshal(&core.Response{
-		Success:         true,
-		OperationReport: make([]string, 0),
+		Success: true,
+		OperationReport: make([]struct {
+			Field     string `json:"Field"`
+			Message   string `json:"Message"`
+			ErrorCode int    `json:"ErrorCode"`
+		}, 0),
 	})
 
 	httpmock.RegisterResponder("POST", isUserInRolesUrl, httpmock.NewStringResponder(http.StatusOK, string(okResponse)))
@@ -206,8 +219,14 @@ func TestIsUserInRoles(t *testing.T) {
 	}
 
 	notOkResponse, _ := json.Marshal(&core.Response{
-		Success:         false,
-		OperationReport: []string{"error"},
+		Success: false,
+		OperationReport: []struct {
+			Field     string `json:"Field"`
+			Message   string `json:"Message"`
+			ErrorCode int    `json:"ErrorCode"`
+		}{
+			{Message: "error"},
+		},
 	})
 
 	httpmock.RegisterResponder("POST", isUserInRolesUrl, httpmock.NewStringResponder(http.StatusOK, string(notOkResponse)))
@@ -244,8 +263,12 @@ func TestValidateToken(t *testing.T) {
 	}
 
 	okResponse, _ := json.Marshal(&core.Response{
-		Success:         true,
-		OperationReport: make([]string, 0),
+		Success: true,
+		OperationReport: make([]struct {
+			Field     string `json:"Field"`
+			Message   string `json:"Message"`
+			ErrorCode int    `json:"ErrorCode"`
+		}, 0),
 	})
 
 	httpmock.RegisterResponder("POST", validateTokenUrl, httpmock.NewStringResponder(http.StatusOK, string(okResponse)))
@@ -257,8 +280,14 @@ func TestValidateToken(t *testing.T) {
 	}
 
 	notOkResponse, _ := json.Marshal(&core.Response{
-		Success:         false,
-		OperationReport: []string{"error"},
+		Success: false,
+		OperationReport: []struct {
+			Field     string `json:"Field"`
+			Message   string `json:"Message"`
+			ErrorCode int    `json:"ErrorCode"`
+		}{
+			{Message: "error"},
+		},
 	})
 
 	httpmock.RegisterResponder("POST", validateTokenUrl, httpmock.NewStringResponder(http.StatusOK, string(notOkResponse)))
@@ -295,8 +324,12 @@ func TestRenewToken(t *testing.T) {
 	}
 
 	okResponse, _ := json.Marshal(&core.Response{
-		Success:         true,
-		OperationReport: make([]string, 0),
+		Success: true,
+		OperationReport: make([]struct {
+			Field     string `json:"Field"`
+			Message   string `json:"Message"`
+			ErrorCode int    `json:"ErrorCode"`
+		}, 0),
 	})
 
 	httpmock.RegisterResponder("POST", renewTokenUrl, httpmock.NewStringResponder(http.StatusOK, string(okResponse)))
@@ -310,8 +343,14 @@ func TestRenewToken(t *testing.T) {
 	notOkResponse, _ := json.Marshal(&renewTokenResponse{
 		NewToken: "token",
 		Response: core.Response{
-			Success:         false,
-			OperationReport: []string{"error"},
+			Success: false,
+			OperationReport: []struct {
+				Field     string `json:"Field"`
+				Message   string `json:"Message"`
+				ErrorCode int    `json:"ErrorCode"`
+			}{
+				{Message: "error"},
+			},
 		},
 	})
 
